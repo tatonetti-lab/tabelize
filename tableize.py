@@ -59,6 +59,7 @@ numrows=0
 #for nrow, row in enumerate(reader):
 for nrow, line in enumerate(fh):
     row = line.strip().split(delim)
+    
     if len(row) != len(header):
         raise Exception("Row length does not match header length:\n line: %s \n row(n=%d): \n %s \n header(n=%d): \n %s" % (line, len(row), row, len(header), header))
     
