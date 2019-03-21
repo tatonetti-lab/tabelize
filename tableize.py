@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', help='column delimiter', default=',')
 parser.add_argument('-i', help='input file')
 parser.add_argument('-n', help='name of SQL table')
+parser.add_argument('-c', help='flag to use csv module to read file', action='store_true')
 
 args = parser.parse_args()
 
@@ -47,7 +48,11 @@ if input_file.endswith('.gz'):
 else:
     fh = open(input_file)
 
-header=fh.readline().strip().split(delim)
+if not args.c:
+    header=fh.readline().strip().split(delim)
+else:
+    reader = csv.reader(fh, delimiter=delim)
+    header = reader.next()
 
 # print header
 
@@ -55,10 +60,18 @@ for column in header:
     info[column]={"maxlength":0,"intcount":0}
 
 numrows=0
-    
-#for nrow, row in enumerate(reader):
-for nrow, line in enumerate(fh):
-    row = line.strip().split(delim)
+
+if not args.c:
+    file_enumerator = enumerate(fh)
+else:
+    file_enumerator = enumerate(reader)
+
+for nrow, line in file_enumerator:
+
+    if not args.c:
+        row = line.strip().split(delim)
+    else:
+        row = line
     
     if len(row) != len(header):
         raise Exception("Row length does not match header length:\n line: %s \n row(n=%d): \n %s \n header(n=%d): \n %s" % (line, len(row), row, len(header), header))
